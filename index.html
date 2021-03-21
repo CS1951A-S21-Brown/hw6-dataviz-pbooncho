@@ -4,18 +4,24 @@
         <meta charset="utf-8">
         <title>Assignment 6 &laquo; Data Visualization Dashboard&raquo;</title>
         <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.6.2/css/bootstrap-slider.min.css">
         <link rel="stylesheet" href="main.css"/>
         <!--Feel free to add more CSS files as needed-->
         <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.6.2/bootstrap-slider.min.js"></script>
     </head>
 <body>
     <div class="header">
         <h3>Assignment 6 &laquo; Data Visualization Dashboard &raquo;</h3>
+        <h5>List of video games with sales greater than 100,000 copies</h5>
     </div>
     <!--  We included a basic HTML structure for the 3 graphs here. Feel free to change this if you'd like  -->
     <div class="row">
         <div class="col-lg-6">
-            <div id="graph1"></div>
+            <div id="graph1">
+                <label id="yearLabel" for="year">Set Year:</label>
+                <input id="year" type="text" class="span2" data-slider-min="1980" data-slider-max="2020" data-slider-step="1" data-slider-value="[2010]"/>
+            </div>
             <div id="graph2"></div><br/>
         </div>
         <div class="col-lg-6">
