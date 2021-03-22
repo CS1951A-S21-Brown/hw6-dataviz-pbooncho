@@ -4,11 +4,10 @@
         <meta charset="utf-8">
         <title>Assignment 6 &laquo; Data Visualization Dashboard&raquo;</title>
         <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.6.2/css/bootstrap-slider.min.css">
         <link rel="stylesheet" href="main.css"/>
         <!--Feel free to add more CSS files as needed-->
         <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.6.2/bootstrap-slider.min.js"></script>
+        <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     </head>
 <body>
     <div class="header">
@@ -19,10 +18,23 @@
     <div class="row">
         <div class="col-lg-6">
             <div id="graph1">
-                <label id="yearLabel" for="year">Set Year:</label>
-                <input id="year" type="text" class="span2" data-slider-min="1980" data-slider-max="2020" data-slider-step="1" data-slider-value="[2010]"/>
+                <div class="slideContainer">
+                    <label id="yearLabel" for="year">Set Year:</label>
+                    <input id="year" type="range" min="1980" max="2020" class="slider" value="2010">
+                    <label id="allTimeLable" for="allTimeBox">All Time</label>
+                    <input id="allTimeBox" type="checkbox" onclick="allTimeHandle()">
+                    <p>Current Year: <span id="year-value"></span></p>
+                </div>
             </div>
-            <div id="graph2"></div><br/>
+            <div id="graph2">
+                <label id="regionLabel" for="region">Choose a region:</label>
+                <select id="region">
+                    <option value="NA">North America</option>
+                    <option value="EU">Europe</option>
+                    <option value="JP">Japan</option>
+                    <option value="OT">Other</option>
+                </select>
+            </div><br>
         </div>
         <div class="col-lg-6">
             <div id="graph3"></div>
