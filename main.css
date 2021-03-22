@@ -18,11 +18,12 @@
     justify-content: center;
     text-align: center;
     align-items: center;
+    flex-direction: column;
 }
 
 .slider {
     appearance: none;
-    width: 100%;
+    width: 200px;
     height: 15px;
     border-radius: 5px;
     background: #d3d3d3;
@@ -37,11 +38,29 @@
 .row {
     text-align: center;
     max-width: 1440px;
-    margin: 0 auto;
+    margin: 10;
+    display: flex;
+    flex-direction: column;
 }
 
 .col-lg-6 {
-    padding: 0;
+    display: flex;
+}
+
+#graph1 {
+    flex: 1;
+}
+#graph2 {
+    flex: 1;
+}
+
+.inputAndLabel {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
 }
 
 text {
@@ -54,4 +73,31 @@ svg {
     font: 10px sans-serif;
 }
 
+label {
+    margin-right: 10px;
+}
 
+button {
+    border: none;
+    border-radius: 20px;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    opacity: 0.65;
+}
+button:hover {
+    opacity: 1;
+}
+.regionButton {
+    background-color: #c93862;
+    padding: 5px 20px;
+    margin: 6px 8px;
+}
+.genreButton {
+    background-color: #570677;
+    padding: 5px 14px;
+    margin: 6px 4px;
+}
