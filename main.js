@@ -73,8 +73,8 @@ function sentenceCase(word) {
 }
 
 function trimText(label) {
-    if (label.length > 20) {
-        return label.substring(0, 20) + "..."
+    if (label.length > 30) {
+        return label.substring(0, 30) + "..."
     }
     return label;
 }
@@ -139,13 +139,30 @@ let color_graph_1 = d3.scaleOrdinal()
 function updateDataGraph1(currentYear, attr) {
     // Filter data by year
     let filteredData = data.filter(function(a) {return validYear(currentYear, a["Year"]);});
-    filteredData.forEach(function(a) {a[attr] = trimText(a[attr])});
-    
-    attr_data = cleanData(filteredData, function(a, b) {return b["Global_Sales"] - a["Global_Sales"]}, NUM_EXAMPLES);
+    // filteredData = cleanData(filteredData, function(a, b) {return b["Global_Sales"] - a["Global_Sales"]}, 3000);
+    // Combine the same games but different platforms
+    let dict = {};
+    let dict2 = {};
+    filteredData.forEach(function(a) {
+        let at = a[attr];
+        if (dict[at]) {
+            dict[at] += parseFloat(a["Global_Sales"]);
+        }  else {
+            dict[at] = parseFloat(a["Global_Sales"]);
+            dict2[at] = a["Rank"];
+        }
+    });
+    let attr_data = [];
+    for (let i=0; i < Object.keys(dict).length; i++) {
+        let key = Object.keys(dict)[i];
+        attr_data.push({attr: trimText(key), sales: dict[key].toFixed(2), rank: dict2[key]});
+    }
 
-    x_graph_1.domain([0, d3.max(attr_data, function(d) { return d["Global_Sales"]; })]);
-    y_graph_1.domain(attr_data.map(function(d) { return d[attr] }));
-    color_graph_1.domain(attr_data.map(function(d) { return d[attr] }));
+    attr_data = cleanData(attr_data, function(a, b) {return b.sales - a.sales}, NUM_EXAMPLES);
+    x_graph_1.domain([0, attr_data[0].sales]);
+    // x_graph_1.domain([0, d3.max(attr_data, function(d) {return d.sales})]);
+    y_graph_1.domain(attr_data.map(function(d) { return d.attr }));
+    color_graph_1.domain(attr_data.map(function(d) { return d.attr }));
     
     // Render y-axis label
     y_axis_label_graph_1.call(d3.axisLeft(y_graph_1).tickSize(0).tickPadding(10));
@@ -156,24 +173,24 @@ function updateDataGraph1(currentYear, attr) {
         .append("rect")
         // Set up mouse interactivity functions
         .on("mouseover", function(d) {
-            svg_graph_1.select(`#rect-${d["Rank"]}`).attr("fill", function(d) {
-                return darkenColor(color_graph_1(d[attr]), 0.75);
+            svg_graph_1.select(`#rect-${d.rank}`).attr("fill", function(d) {
+                return darkenColor(color_graph_1(d.attr), 0.75);
             });
         })
         .on("mouseout", function(d) {
-            svg_graph_1.select(`#rect-${d["Rank"]}`).attr("fill", function(d) {
-                return color_graph_1(d[attr])
+            svg_graph_1.select(`#rect-${d.rank}`).attr("fill", function(d) {
+                return color_graph_1(d.attr)
             });
         })
         .merge(bars)
         .transition()
         .duration(1000)
-        .attr("fill", function(d) { return color_graph_1(d[attr]) })
+        .attr("fill", function(d) { return color_graph_1(d.attr) })
         .attr("x", x_graph_1(0))
-        .attr("y", function(d) { return y_graph_1(d[attr]); })
-        .attr("width", function(d) { return x_graph_1(d["Global_Sales"]); })
+        .attr("y", function(d) { return y_graph_1(d.attr); })
+        .attr("width", function(d) { return x_graph_1(d.sales); })
         .attr("height",  y_graph_1.bandwidth())
-        .attr("id", function(d) { return `rect-${d["Rank"]}` });
+        .attr("id", function(d) { return `rect-${d.rank}` });
     
     let sales = salesRef_graph_1.selectAll("text").data(attr_data);
     // Render the text elements on the DOM
@@ -182,10 +199,10 @@ function updateDataGraph1(currentYear, attr) {
         .merge(sales)
         .transition()
         .duration(1000)
-        .attr("x", function(d) { return x_graph_1(d["Global_Sales"]) + 10; })
-        .attr("y", function(d) { return y_graph_1(d[attr]) + 10; })
+        .attr("x", function(d) { return x_graph_1(d.sales) + 10; })
+        .attr("y", function(d) { return y_graph_1(d.attr) + 10; })
         .style("text-anchor", "start")
-        .text(function(d) {return d["Global_Sales"];});
+        .text(function(d) {return d.sales;});
     y_axis_text.text(sentenceCase(attr));
     if (all_time_toggle == true) {
         title_graph_1.text("All-time Top 10 Video Games");
@@ -215,35 +232,42 @@ let svg_graph_2 = d3.select("#graph2")
     .attr("width", graph_2_width)
     .attr("height", graph_2_height)
     .append("g")
-    .attr("transform", `translate(${graph_2_width / 2}, ${(graph_2_height / 2) + 10})`);
+    .attr("transform", `translate(${graph_2_width / 2}, ${graph_2_height / 2})`);
 
 let radius = Math.min(graph_1_height, graph_1_width) / 2;
 
 // Add title
-let title_graph_2 = svg_graph_2.append("text")
-    .attr("transform", `translate(0, ${-1 * radius})`)
-    .style("text-anchor", "middle")
-    .style("font-size", 18);
+// let title_graph_2 = svg_graph_2.append("text")
+//     .attr("transform", `translate(0, ${-1 * radius})`)
+//     .style("text-anchor", "middle")
+//     .style("font-size", 18)
+//     .text(`Top Genres in each region`);
 
 function updateDataGraph2(currentRegion) {
     let regionData = data;
     let dict = {}
     let curr_sales;
+    let cutoff;
     switch (currentRegion) {
         case "North America":
             curr_sales = "NA_Sales";
+            cutoff = 200;
             break;
         case "Europe":
             curr_sales = "EU_Sales";
+            cutoff = 100;
             break;
         case "Japan":
             curr_sales = "JP_Sales";
+            cutoff = 50;
             break;
         case "Other":
             curr_sales = "Other_Sales";
+            cutoff = 30;
             break;
         default:
             curr_sales = "NA_Sales";
+            cutoff = 200;
             break;
     };
     regionData.forEach(function(a) {
@@ -258,7 +282,7 @@ function updateDataGraph2(currentRegion) {
     let other_genres_sales = 0;
     for (let i = 0; i < Object.keys(dict).length; i++) {
         let k = Object.keys(dict)[i];
-        if (dict[k] < 200) {
+        if (dict[k] < cutoff) {
             other_genres_sales += dict[k];
         } else {
             clean_dict[k] = dict[k];
@@ -270,10 +294,11 @@ function updateDataGraph2(currentRegion) {
     let data_ready = pie(d3.entries(clean_dict));
     let arc = d3.arc().innerRadius(radius * 0.4).outerRadius(radius * 0.8);
     let outerArc = d3.arc().innerRadius(radius * 0.9).outerRadius(radius * 0.9);
-    let slices = svg_graph_2.selectAll('allSlices')
+    let slices = svg_graph_2.selectAll("path")
         .data(data_ready);
     slices.enter()
         .append('path')
+        .merge(slices)
         .transition()
         .duration(1000)
         .attr("d", arc)
@@ -281,25 +306,27 @@ function updateDataGraph2(currentRegion) {
         .attr("stroke", "white")
         .style("stroke-width", "2px")
         .style("opacity", 0.75);
-    let lines = svg_graph_2.selectAll('allPolylines')
+    let lines = svg_graph_2.selectAll("polyline")
         .data(data_ready);
     lines.enter()
         .append('polyline')
+        .merge(lines)
         .attr("stroke", "black")
         .style("fill", "none")
         .attr("stroke-width", 1)
         .attr('points', function(d) {
             var posA = arc.centroid(d);
             var posB = outerArc.centroid(d);
-            var posC = posB;
+            var posC = outerArc.centroid(d);
             var midAngle = d.startAngle + (d.endAngle - d.startAngle) / 2;
             posC[0] = radius * 0.95 * (midAngle < Math.PI ? 1 : -1);
             return [posA, posB, posC];
         });
-    let labels = svg_graph_2.selectAll('allLabels')
+    let labels = svg_graph_2.selectAll("text")
         .data(data_ready);
     labels.enter()
         .append('text')
+        .merge(labels)
         .text(function(d) {return d.data.key + ' ( ' + d.data.value.toFixed(2) + ' M )'})
         .attr('transform', function(d) {
             var pos = outerArc.centroid(d);
@@ -311,10 +338,10 @@ function updateDataGraph2(currentRegion) {
             var midAngle = d.startAngle + (d.endAngle - d.startAngle) / 2;
             return (midAngle < Math.PI ? 'start' : 'end');
         });
-    title_graph_2.text(`Top Genres in ${currentRegion}`);
     slices.exit().remove();
     lines.exit().remove();
     labels.exit().remove();
+    //title_graph_2.text(`Top Genres in ${currentRegion}`);
 }
 
 //
@@ -328,12 +355,30 @@ let svg_graph_3 = d3.select("#graph3")
     .attr("width", graph_3_width)
     .attr("height", graph_3_height)
     .append("g")
-    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+    .attr("transform", `translate(${margin.left + 40}, ${margin.top})`);
 
-let tooltip = d3.select("body")
+let tooltip = d3.select("#graph3")
     .append("div")
     .attr("class", "tooltip")
-    .style("opacity", 0);
+    .style("opacity", 0)
+    .style("background-color", "#d5b1e3")
+    .style("color", "black")
+    .style("border", "solid #570677")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "10px");
+
+let mouseover = function(d) {
+    let html = `${d.publisher}<br>${d.count}`;
+    tooltip.html(html)
+        .style("left", (d3.mouse(this)[0] + 250) + "px")
+        .style("top", (d3.mouse(this)[1] + 100) + "px")
+        .style("opacity", 1);
+}
+let mouseleave = function(d) {
+    tooltip.transition().duration(500).style("opacity", 0);
+}
+
 // Declare axes and labels
 let x_graph_3 = d3.scaleLinear().range([0, graph_3_width - margin.left - margin.right]);
 let x_graph_3_label = svg_graph_3.append("g")
@@ -342,11 +387,11 @@ let y_graph_3 = d3.scaleBand().range([0, graph_3_height - margin.top - margin.bo
 let y_graph_3_label = svg_graph_3.append("g");
 // Add axes' labels
 svg_graph_3.append("text")
-    .attr("transform", `translate(${(graph_3_width - margin.left - margin.right) / 2}, ${(graph_3_height - margin.top - margin.bottom) + 25})`)
+    .attr("transform", `translate(${(graph_3_width - margin.left - margin.right) / 2}, ${(graph_3_height - margin.top - margin.bottom) + 28})`)
     .style("text-anchor", "middle")
     .text("Count");
 svg_graph_3.append("text")
-    .attr("transform", `translate(-140, ${(graph_3_height - margin.top - margin.bottom) / 2})`)
+    .attr("transform", `translate(-170, ${(graph_3_height - margin.top - margin.bottom) / 2})`)
     .style("text-anchor", "middle")
     .text("Publisher");
 let color_graph_3 = d3.scaleOrdinal();
@@ -355,25 +400,6 @@ let title_graph_3 = svg_graph_3.append("text")
     .attr("transform", `translate(${(graph_3_width - margin.left - margin.right) / 2}, ${-20})`)
     .style("text-anchor", "middle")
     .style("font-size", 18)
-let mouseover = function(d) {
-    let color_span = `<span style="color: ${color_graph_3(d["Publisher"])};">`;
-    let html = `${d["Rank"]}<br/>
-        ${color_span}${d["Publisher"]}</span><br/>
-        Publisher: ${color_span}${d["Publisher"]}</span>`;
-    
-    tooltip.html(html)
-        .style("left", `${(d3.event.pageX) + 30}px`)
-        .style("top", `${(d3.event.pageY) - 100}px`)
-        .style("box-shadow", `2px 2px 5px ${color_graph_3(d["Publisher"])}`)
-        .transition()
-        .duration(200)
-        .style("opacity", 0.9)
-};
-let mouseout = function(d) {
-    tooltip.transition()
-        .duration(200)
-        .style("opacity", 0);
-};
 
 function updateDataGraph3(currentGenre) {
     let filteredData = data.filter(function(d) {return d["Genre"] == currentGenre});
@@ -400,15 +426,66 @@ function updateDataGraph3(currentGenre) {
     dots.enter()
         .append("circle")
         .on("mouseover", mouseover)
-        .on("mouseout", mouseout)
+        .on("mouseleave", mouseleave)
         .merge(dots)
         .transition()
         .duration(1000)
         .attr("cx", function(d) {return x_graph_3(d.count)})
-        .attr("cy", function(d) {return y_graph_3(d.publisher) + 15})
-        .attr("r", 4)
+        .attr("cy", function(d) {return y_graph_3(d.publisher) + 18})
+        .attr("r", 8)
         .attr("fill", "#570677")
         .style("opacity", 0.75);
     title_graph_3.text(`Top Publishers for ${currentGenre} games`);
     dots.exit().remove();
 }
+
+
+// let svg_graph_4 = d3.select("#graph4")
+//     .append("svg")
+//     .attr("width", 400)
+//     .attr("height", 400)
+//     .append("g")
+//     .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+// function buildBoxPlot() {
+//     let filteredData = data.filter(function(d) {return d["Genre"] == curr_genre});
+//     let dict = {};
+//     filteredData.forEach(function(a) {
+//         let publisher = trimText(a["Publisher"]);
+//         if (dict[publisher]) {
+//             dict[publisher] += 1;
+//         } else {
+//             dict[publisher] = 1;
+//         }
+//     });
+//     let clean_data = [];
+//     for (let i = 0; i < Object.keys(dict).length; i++) {
+//         let key = Object.keys(dict)[i];
+//         clean_data.push(dict[key]);
+//     }
+//     clean_data = cleanData(clean_data, function(a, b) {return a - b}, 100);
+//     console.log(clean_data);
+//     let q1 = d3.quantile(clean_data, 0.25);
+//     let median = d3.quantile(clean_data, 0.5);
+//     let q3 = d3.quantile(clean_data, 0.75);
+//     let interQuantileRange = q3 - q1;
+//     let min = q1 - 1.5 * interQuantileRange;
+//     let max = q3 + 1.5 * interQuantileRange;
+//     let x = d3.scaleLinear().domain([0, clean_data[0].count]).range(400 - margin.left - margin.right);
+//     svg_graph_4.call(d3.axisBottom(x));
+//     let center = 200;
+//     let height = 100;
+//     svg_graph_4.append("line")
+//         .attr("y1", center)
+//         .attr("y2", center)
+//         .attr("x1", x(min))
+//         .attr("x2", x(max))
+//         .attr("stroke", "black");
+//     svg_graph_4.append("rect")
+//         .attr("y", center - height / 2)
+//         .attr("x", x(q3))
+//         .attr("height", height)
+//         .attr("width", x(q1)- x(q3))
+//         .attr("stroke", "black")
+//         .style("fill", "#69b3a2")
+// }

@@ -25,7 +25,7 @@
                         <input id="year" type="range" min="1980" max="2020" class="slider" value="1983">
                     </div>
                     <div class="inputAndLabel">
-                        <label id="allTimeLable" for="allTimeBox">All Time </label>
+                        <label id="allTimeLabel" for="allTimeBox">All Time</label>
                         <input id="allTimeBox" type="checkbox" onclick="allTimeHandle()">
                     </div> 
                     <p>Current Search Year: <span id="year-value"></span></p>
@@ -39,7 +39,8 @@
                     <button type="button" class="regionButton" onclick="setRegion('Japan')">Japan</button>
                     <button type="button" class="regionButton" onclick="setRegion('Other')">Other</button>
                 </div>
-                <p>Current Search Region: <span id="region-value"></span></p>
+                <br>
+                <p style="font-size: larger; font-weight: bolder;">Top Genres in <span id="region-value"></span></p>
             </div>
         </div>
         <div class="col-lg-6">
