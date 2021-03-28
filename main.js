@@ -11,6 +11,7 @@ let graph_3_width = MAX_WIDTH * 0.75, graph_3_height = 400;
 
 let data;
 let all_time_toggle = false;
+let stat_toggle = true;
 let slider = document.getElementById("year");
 let curr_year = slider.value;
 let curr_year_output = document.getElementById("year-value");
@@ -22,24 +23,7 @@ slider.oninput = function() {
     updateDataGraph1(curr_year, "Name");
 }
 
-let curr_region = "North America";
-let curr_region_output = document.getElementById("region-value");
-curr_region_output.innerHTML = curr_region;
-function setRegion(region) {
-    curr_region_output.innerHTML = region;
-    curr_region = region;
-    updateDataGraph2(curr_region);
-}
-
-let curr_genre = "Action";
-let curr_genre_output = document.getElementById("genre-value");
-curr_genre_output.innerHTML = curr_genre;
-function setGenre(genre) {
-    curr_genre_output.innerHTML = genre;
-    curr_genre = genre;
-    updateDataGraph3(curr_genre);
-}
-
+// Update graph1 representation to all-time data
 function allTimeHandle() {
     let checkBox = document.getElementById("allTimeBox");
     if (checkBox.checked) {
@@ -50,6 +34,36 @@ function allTimeHandle() {
         curr_year_output.innerHTML = curr_year;
     }
     updateDataGraph1(curr_year, "Name");
+}
+
+let curr_region = "North America";
+let curr_region_output = document.getElementById("region-value");
+curr_region_output.innerHTML = curr_region;
+// Update current region based on button clicked in graph2
+function setRegion(region) {
+    curr_region_output.innerHTML = region;
+    curr_region = region;
+    updateDataGraph2(curr_region);
+}
+
+let curr_genre = "Action";
+let curr_genre_output = document.getElementById("genre-value");
+curr_genre_output.innerHTML = curr_genre;
+// Update current genre based on button clicked in graph3
+function setGenre(genre) {
+    curr_genre_output.innerHTML = genre;
+    curr_genre = genre;
+    updateDataGraph3(curr_genre);
+}
+
+function statHandle() {
+    let checkBox = document.getElementById("statBox");
+    if (checkBox.checked) {
+        stat_toggle = true;
+    } else {
+        stat_toggle = false;
+    }
+    updateDataGraph3(curr_genre);
 }
 
 // Load data from video_games.csv file
@@ -65,9 +79,7 @@ function updateDashboard() {
     updateDataGraph3(curr_genre);
 }
 
-/**
- * Converts a text to sentence case
- */
+// Converts a text to sentence case
 function sentenceCase(word) {
     return `${word[0].toUpperCase()}${word.substring(1)}`;
 }
@@ -207,7 +219,7 @@ function updateDataGraph1(currentYear, attr) {
     if (all_time_toggle == true) {
         title_graph_1.text("All-time Top 10 Video Games");
     } else {
-        title_graph_1.text(`Top 10 Video Games in ${currentYear}`);
+        title_graph_1.text(`Top 10 Video Games released in ${currentYear}`);
     }
     bars.exit().remove();
     sales.exit().remove();
@@ -235,13 +247,6 @@ let svg_graph_2 = d3.select("#graph2")
     .attr("transform", `translate(${graph_2_width / 2}, ${graph_2_height / 2})`);
 
 let radius = Math.min(graph_1_height, graph_1_width) / 2;
-
-// Add title
-// let title_graph_2 = svg_graph_2.append("text")
-//     .attr("transform", `translate(0, ${-1 * radius})`)
-//     .style("text-anchor", "middle")
-//     .style("font-size", 18)
-//     .text(`Top Genres in each region`);
 
 function updateDataGraph2(currentRegion) {
     let regionData = data;
@@ -341,7 +346,6 @@ function updateDataGraph2(currentRegion) {
     slices.exit().remove();
     lines.exit().remove();
     labels.exit().remove();
-    //title_graph_2.text(`Top Genres in ${currentRegion}`);
 }
 
 //
@@ -355,7 +359,7 @@ let svg_graph_3 = d3.select("#graph3")
     .attr("width", graph_3_width)
     .attr("height", graph_3_height)
     .append("g")
-    .attr("transform", `translate(${margin.left + 40}, ${margin.top})`);
+    .attr("transform", `translate(${margin.left + 40}, ${margin.top - 5})`);
 
 let tooltip = d3.select("#graph3")
     .append("div")
@@ -397,9 +401,48 @@ svg_graph_3.append("text")
 let color_graph_3 = d3.scaleOrdinal();
 // Add title
 let title_graph_3 = svg_graph_3.append("text")
-    .attr("transform", `translate(${(graph_3_width - margin.left - margin.right) / 2}, ${-20})`)
+    .attr("transform", `translate(${(graph_3_width - margin.left - margin.right) / 2}, ${-5})`)
     .style("text-anchor", "middle")
     .style("font-size", 18)
+// Add stats
+let stats_graph_3 = svg_graph_3.append("text")
+    .attr("transform", `translate(${(graph_3_width - margin.left - margin.right) - 60}, ${((graph_3_height - margin.top - margin.bottom) / 2) - 45})`)
+    .style("text-anchor", "middle")
+    .style("font-size", 16)
+    .style("font-weight", "bold")
+    .text("Graph's Statistical Info");
+let stats_graph_3_sum = svg_graph_3.append("text")
+    .attr("transform", `translate(${(graph_3_width - margin.left - margin.right) - 60}, ${((graph_3_height - margin.top - margin.bottom) / 2) - 20})`)
+    .style("text-anchor", "middle")
+    .style("font-size", 14)
+let stats_graph_3_max = svg_graph_3.append("text")
+    .attr("transform", `translate(${(graph_3_width - margin.left - margin.right) - 60}, ${((graph_3_height - margin.top - margin.bottom) / 2)})`)
+    .style("text-anchor", "middle")
+    .style("font-size", 14)
+let stats_graph_3_min = svg_graph_3.append("text")
+    .attr("transform", `translate(${(graph_3_width - margin.left - margin.right) - 60}, ${((graph_3_height - margin.top - margin.bottom) / 2) + 20})`)
+    .style("text-anchor", "middle")
+    .style("font-size", 14)
+let stats_graph_3_mean = svg_graph_3.append("text")
+    .attr("transform", `translate(${(graph_3_width - margin.left - margin.right) - 60}, ${((graph_3_height - margin.top - margin.bottom) / 2) + 40})`)
+    .style("text-anchor", "middle")
+    .style("font-size", 14)
+let stats_graph_3_std = svg_graph_3.append("text")
+    .attr("transform", `translate(${(graph_3_width - margin.left - margin.right) - 60}, ${((graph_3_height - margin.top - margin.bottom) / 2) + 60})`)
+    .style("text-anchor", "middle")
+    .style("font-size", 14)
+let stats_graph_3_q1 = svg_graph_3.append("text")
+    .attr("transform", `translate(${(graph_3_width - margin.left - margin.right) - 60}, ${((graph_3_height - margin.top - margin.bottom) / 2) + 80})`)
+    .style("text-anchor", "middle")
+    .style("font-size", 14)
+let stats_graph_3_q2 = svg_graph_3.append("text")
+    .attr("transform", `translate(${(graph_3_width - margin.left - margin.right) - 60}, ${((graph_3_height - margin.top - margin.bottom) / 2) + 100})`)
+    .style("text-anchor", "middle")
+    .style("font-size", 14)
+let stats_graph_3_q3 = svg_graph_3.append("text")
+    .attr("transform", `translate(${(graph_3_width - margin.left - margin.right) - 60}, ${((graph_3_height - margin.top - margin.bottom) / 2) + 120})`)
+    .style("text-anchor", "middle")
+    .style("font-size", 14)
 
 function updateDataGraph3(currentGenre) {
     let filteredData = data.filter(function(d) {return d["Genre"] == currentGenre});
@@ -437,55 +480,49 @@ function updateDataGraph3(currentGenre) {
         .style("opacity", 0.75);
     title_graph_3.text(`Top Publishers for ${currentGenre} games`);
     dots.exit().remove();
+    let count_list = [];
+    clean_data.forEach(function(a) {
+        count_list.push(a.count)
+    });
+    count_list = count_list.sort((a, b) => a - b);
+    let sum = count_list.reduce((a, b) => a + b, 0);
+    let n = count_list.length;
+    let mean = sum / n;
+    let std = Math.sqrt(count_list.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / (n - 1));
+    let q1 = quantileCalculator(count_list, 0.25);
+    let q2 = quantileCalculator(count_list, 0.5);
+    let q3 = quantileCalculator(count_list, 0.75);
+    stats_graph_3_sum.text(`Sum = ${sum}`);
+    stats_graph_3_max.text(`Max = ${count_list[n - 1]}`);
+    stats_graph_3_min.text(`Min = ${count_list[0]}`);
+    stats_graph_3_mean.text(`Mean = ${mean.toFixed(2)}`);
+    stats_graph_3_std.text(`Std. deviation = ${std.toFixed(2)}`);
+    stats_graph_3_q1.text(`1st Quantile = ${q1.toFixed(2)}`);
+    stats_graph_3_q2.text(`2nd Quantile (Median) = ${q2.toFixed(2)}`);
+    stats_graph_3_q3.text(`3rd Quantile = ${q3.toFixed(2)}`);
+    let elementList = [stats_graph_3, stats_graph_3_sum, stats_graph_3_max, stats_graph_3_min, stats_graph_3_mean, stats_graph_3_std, stats_graph_3_q1, stats_graph_3_q2, stats_graph_3_q3];
+    if (stat_toggle == false) {
+        setVisibility(elementList, "hidden");
+    }
+    else {
+        setVisibility(elementList, "visible");
+    }
 }
 
+function quantileCalculator(array, q) {
+    let pos = (array.length - 1) * q;
+    let base = Math.floor(pos);
+    let rest = pos - base;
+    if (array[base + 1] !== undefined) {
+        return array[base] + rest * (array[base + 1] - array[base]);
+    }
+    else {
+        return sorted[base];
+    }
+}
 
-// let svg_graph_4 = d3.select("#graph4")
-//     .append("svg")
-//     .attr("width", 400)
-//     .attr("height", 400)
-//     .append("g")
-//     .attr("transform", `translate(${margin.left}, ${margin.top})`);
-
-// function buildBoxPlot() {
-//     let filteredData = data.filter(function(d) {return d["Genre"] == curr_genre});
-//     let dict = {};
-//     filteredData.forEach(function(a) {
-//         let publisher = trimText(a["Publisher"]);
-//         if (dict[publisher]) {
-//             dict[publisher] += 1;
-//         } else {
-//             dict[publisher] = 1;
-//         }
-//     });
-//     let clean_data = [];
-//     for (let i = 0; i < Object.keys(dict).length; i++) {
-//         let key = Object.keys(dict)[i];
-//         clean_data.push(dict[key]);
-//     }
-//     clean_data = cleanData(clean_data, function(a, b) {return a - b}, 100);
-//     console.log(clean_data);
-//     let q1 = d3.quantile(clean_data, 0.25);
-//     let median = d3.quantile(clean_data, 0.5);
-//     let q3 = d3.quantile(clean_data, 0.75);
-//     let interQuantileRange = q3 - q1;
-//     let min = q1 - 1.5 * interQuantileRange;
-//     let max = q3 + 1.5 * interQuantileRange;
-//     let x = d3.scaleLinear().domain([0, clean_data[0].count]).range(400 - margin.left - margin.right);
-//     svg_graph_4.call(d3.axisBottom(x));
-//     let center = 200;
-//     let height = 100;
-//     svg_graph_4.append("line")
-//         .attr("y1", center)
-//         .attr("y2", center)
-//         .attr("x1", x(min))
-//         .attr("x2", x(max))
-//         .attr("stroke", "black");
-//     svg_graph_4.append("rect")
-//         .attr("y", center - height / 2)
-//         .attr("x", x(q3))
-//         .attr("height", height)
-//         .attr("width", x(q1)- x(q3))
-//         .attr("stroke", "black")
-//         .style("fill", "#69b3a2")
-// }
+function setVisibility(elementList, status) {
+    elementList.forEach(function(e) {
+        e.style("visibility", status);
+    })
+}

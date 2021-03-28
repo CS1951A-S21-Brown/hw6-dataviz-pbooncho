@@ -61,8 +61,50 @@
                     <button type="button" class="genreButton" onclick="setGenre('Strategy')">Strategy</button>
                 </div>
                 <p>Current Search Genre: <span id="genre-value"></span></p>
+                <label id="statLabel" for="statBox">Show Statistical Info</label>
+                <input id="statBox" type="checkbox" onclick="statHandle()" checked>
             </div>
         </div>
+        <p style="font-size: x-large;">Remark / Note: (All graphs are dynamic)</p>
+        <p style="font-weight: bold; font-size: larger;">Graph 1 (Bar plot)</p>
+        <p>1) use slide bar to adjust year to show specific year data</p>
+        <p>2) click on "All Time" checkbox to show all-time data (however, it might take time to render)</p>
+        <p>3) darken color on the bar when users hover over it</p>
+        <p style="font-weight: bold; font-size: larger;">Graph 2 (Pie chart)</p>
+        <p>1) click on region buttons to show specific region data</p>
+        <p>2) all sectors of pie chart are sorted by sales from the top then goes counterclockwise</p>
+        <p>3) genres that have few sales are combined together into others pie sector</p>
+        <p>4) colors in each pie sector are implemented by d3.schemeSet3</p>
+        <p style="font-weight: bold; font-size: larger;">Graph 3 (Scatter plot)</p>
+        <p>1) click on genre buttons to show specific genre data</p>
+        <p>2) publishers are sorted by the number of games made by that publisher from top to bottom</p>
+        <p>3) tooltips are shown when users hover over a data point (show x and y information)</p>
+        <p>4) {Extra Credit} click on "Show Statistical Info" checkbox to show the graph's statistical info (uncheck the box to hide)</p>
+        <p>It's statistical since all of numbers shown can be used to describe the distribution of data which can used to predict the number of games made by unknown publisher</p>
+        <h2>Written Questions</h2>
+        <p style="font-weight: bold; font-size: larger;">1.</p>
+        <p>In graph1, it directly represents top 10 video games by global sales in their release year and top 10 video games of all time (also combining the same game on different consoles)</p>
+        <p>In graph2, it divides data into group by region. Then in each group (region), it represents top genres ranked by sales in that region</p>
+        <p>In graph3, it divides data into group by genre. The in each group (genre), it represents 10 publishers that have the most number of games published</p>
+        <p style="font-weight: bold; font-size: larger;">2.</p>
+        <p>- it supports HTML, CSS, and SVG which are the important tools for data visualization</p>
+        <p>- it is able to handle events (listening and dispatching) which make graphs dynamic (click, mouseover, submit)</p>
+        <p>- it allows to draw shape and build graph easily using circle, rect, line, text, arc, and many more elements</p>
+        <p>- it has d3-scale-chromatic module providing sequential, diverging and categorical color schemes to make graph more colorful and vivid</p>
+        <p style="font-weight: bold; font-size: larger;">3.</p>
+        <p>- it creates data visualization that is easily understood by audiences; however, it is not friendly for programmers since some syntax is very confusing and not quite straightforward</p>
+        <p>- it poorly performs when dealing with large quantities of elements</p>
+        <p>- Since d3 relies heavily on SVG, SVG supports only for 2-dimensional figures and graphs; therefore, d3 is not good for 3-dimensional visualization</p>
+        <p style="font-weight: bold; font-size: larger;">4.</p>
+        <p>According to "Design equivalent experiences for all your readers" section in "Why Accessibility Is at the Heart of Data Visualization,"</p>
+        <p>my dashboard might make color-blinded people have more difficulty, especially in pie chart, these people will have a hard time distinguish</p>
+        <p>between each pie sector as they will see those sectors to be the same big sector; however, I have implement white lines to separate each</p>
+        <p>pie sector and labels with the number of sales so even if they cannot clearly see the sectors, they can still understand. I could make</p>
+        <p>my dashboard support VoiceOver by using more generic html tag instead of div tag to make it more accessible to all audiences.</p>
+        <p>Other than these groups of people would find my dashboard extremely accessible.</p>
+        <p style="font-weight: bold; font-size: larger;">5.</p>
+        <p>- provides some descriptions on how to use buttons / sliders / checkbox to dynamically change data</p>
+        <p>- provides some color-picker or font-size-change options to allow audiences pick the color theme that is friendly to their visualization </p>
     </div>
     <!--Feel free to add more JavaScript files as needed-->
     <script type="text/javascript" src="main.js"></script>
